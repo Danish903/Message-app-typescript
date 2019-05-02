@@ -1,41 +1,68 @@
 import * as React from "react";
-import { View, Text, TextInput, Button, TouchableOpacity } from "react-native";
-import { Mutation } from "react-apollo";
+import {
+   View,
+   Text,
+   TextInput,
+   TouchableOpacity,
+   Alert,
+   AsyncStorage
+} from "react-native";
+
 import { styles } from "../styles/styles";
 import { NavigationScreenProps } from "react-navigation";
-import { gql } from "apollo-boost";
 
-const LOGIN_MUTATION = gql`
-   mutation Login {
-      login(email: "buster@gmail.com", password: "password") {
-         id
-         name
-         email
-      }
-   }
-`;
-interface Props extends NavigationScreenProps {}
+import {
+   LoginComponent,
+   LoginMutation,
+   LoginMutationVariables,
+   MeQuery
+} from "../generated/apolloComponents";
+import { MutationFn } from "react-apollo";
+
+interface Props extends NavigationScreenProps {
+   data: MeQuery | undefined;
+}
 
 export interface LoginState {
    email: string;
    password: string;
 }
+type LoginMutationType = MutationFn<LoginMutation, LoginMutationVariables>;
 
-class Login extends React.PureComponent<Props, LoginState> {
-   static navigationOptions = {
-      title: "Please Log in"
-   };
+export default class Login extends React.PureComponent<Props, LoginState> {
    state: LoginState = {
       email: "",
       password: ""
    };
+   async componentDidMount() {
+      const userId = await AsyncStorage.getItem("userId");
+      if (!!userId) {
+         this.props.navigation.navigate("Home");
+      }
+   }
 
+   handleLogin = async (login: LoginMutationType) => {
+      const { email, password } = this.state;
+      const response = await login({
+         variables: {
+            email,
+            password
+         }
+      });
+      if (response && response.data && response.data.login) {
+         await AsyncStorage.setItem("userId", response.data.login.id);
+
+         this.props.navigation.navigate("Home");
+      } else {
+         Alert.alert("Login Failed", "Invalid login!");
+      }
+   };
    render() {
       const { email, password } = this.state;
 
       return (
-         <Mutation mutation={LOGIN_MUTATION}>
-            {(mutate: any) => (
+         <LoginComponent>
+            {login => (
                <View style={styles.container}>
                   <Text>Login</Text>
                   <TextInput
@@ -57,8 +84,7 @@ class Login extends React.PureComponent<Props, LoginState> {
                   />
                   <TouchableOpacity
                      onPress={async () => {
-                        const response = await mutate();
-                        console.log(response);
+                        this.handleLogin(login);
                      }}
                      style={styles.button}
                   >
@@ -72,9 +98,9 @@ class Login extends React.PureComponent<Props, LoginState> {
                   </TouchableOpacity>
                </View>
             )}
-         </Mutation>
+         </LoginComponent>
       );
    }
 }
 
-export default Login;
+// export default Login;

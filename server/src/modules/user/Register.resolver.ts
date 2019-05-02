@@ -21,6 +21,7 @@ class RegisterResolver {
       email,
       firstName,
       lastName,
+      bio,
       password
    }: RegisterInput): Promise<User> {
       const hashedPassword = await bcrypt.hash(password, 12);
@@ -28,7 +29,8 @@ class RegisterResolver {
          firstName,
          lastName,
          email,
-         password: hashedPassword
+         password: hashedPassword,
+         bio
       }).save();
       await sendEmail(user.email, await createConfimationEmail(user.id));
       return user;

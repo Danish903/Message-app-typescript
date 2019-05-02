@@ -8,8 +8,7 @@ const AuthNavigator = createStackNavigator({
       navigationOptions: { header: null }
    },
    Signup: {
-      screen: Signup,
-      navigationOptions: { header: null }
+      screen: Signup
    }
 });
 

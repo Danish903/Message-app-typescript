@@ -3,7 +3,9 @@ import {
    PrimaryGeneratedColumn,
    Column,
    BaseEntity,
-   OneToMany
+   OneToMany,
+   CreateDateColumn,
+   UpdateDateColumn
 } from "typeorm";
 import { ObjectType, Field, ID, Root, Ctx } from "type-graphql";
 import { AuthorBook } from "./AuthorBook";
@@ -20,6 +22,10 @@ export class User extends BaseEntity {
    @Field()
    @Column()
    firstName: string;
+
+   @Field({ nullable: true })
+   @Column("text", { nullable: true })
+   photo?: string;
 
    @Field()
    @Column()
@@ -39,6 +45,10 @@ export class User extends BaseEntity {
    @Column()
    password: string;
 
+   @Field()
+   @Column({ default: "default" })
+   bio: string;
+
    @OneToMany(() => AuthorBook, ab => ab.user)
    bookConnection: Promise<AuthorBook[]>;
 
@@ -47,4 +57,11 @@ export class User extends BaseEntity {
       // console.log("===========", ct);
       return ctx.booksLoader.load(this.id);
    }
+
+   @Field(() => Date)
+   @CreateDateColumn()
+   created_at: Date;
+   @Field(() => Date)
+   @UpdateDateColumn()
+   updated_at: Date;
 }
