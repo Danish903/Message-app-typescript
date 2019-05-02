@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View, Text, TextInput, Button } from "react-native";
+import { View, Text, TextInput, Button, TouchableOpacity } from "react-native";
 import { styles } from "../styles/styles";
 import { NavigationScreenProps } from "react-navigation";
 
@@ -26,11 +26,13 @@ class Login extends React.PureComponent<Props, LoginState> {
          <View style={styles.container}>
             <Text>Login</Text>
             <TextInput
+               style={styles.border}
                value={email}
                onChangeText={(value: string) => this.setState({ email: value })}
                placeholder="Email"
             />
             <TextInput
+               style={styles.border}
                value={password}
                onChangeText={(value: string) =>
                   this.setState({ password: value })
@@ -38,14 +40,18 @@ class Login extends React.PureComponent<Props, LoginState> {
                placeholder="Password"
                secureTextEntry
             />
-            <Button
-               title="Login"
+            <TouchableOpacity
                onPress={() => this.props.navigation.navigate("Home")}
-            />
-            <Button
-               title="Signup"
+               style={styles.button}
+            >
+               <Text>Login</Text>
+            </TouchableOpacity>
+            <Text> OR </Text>
+            <TouchableOpacity
                onPress={() => this.props.navigation.navigate("Signup")}
-            />
+            >
+               <Text>Signup</Text>
+            </TouchableOpacity>
          </View>
       );
    }
