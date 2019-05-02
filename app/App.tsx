@@ -1,9 +1,10 @@
 import React from "react";
-import TabNavigatior from "./src/navigation/TabNavigatior";
+import { ApolloProvider } from "react-apollo";
 import { createStore, combineReducers } from "redux";
 import { countReducer } from "./src/reducers";
 import { Provider } from "react-redux";
 import SwitchNavigator from "./src/navigation/SwitchNavigator";
+import client from "./src/apollo/apollo";
 
 const rootReducer = combineReducers({
    count: countReducer
@@ -21,8 +22,10 @@ const store = configureStore();
 interface Props {}
 
 const App = () => (
-   <Provider store={store}>
-      <SwitchNavigator />
-   </Provider>
+   <ApolloProvider client={client}>
+      <Provider store={store}>
+         <SwitchNavigator />
+      </Provider>
+   </ApolloProvider>
 );
 export default App;
