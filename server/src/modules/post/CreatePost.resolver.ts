@@ -17,7 +17,7 @@ import { Upload } from "../..//types/Upload";
 import { MyContext } from "src/types/MyContext";
 import { isAuth } from "../middleware/isAuth";
 
-const processFileUpload = async (
+export const processFileUpload = async (
    filename: string,
    createReadStream: () => Stream
 ): Promise<{ id: string; path: string; imageName: string } | null> => {

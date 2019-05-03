@@ -19,6 +19,7 @@ export type ChangePasswordInput = {
 
 export type Mutation = {
   createPost: Post;
+  uploadPhoto: Scalars["String"];
   confirmUser?: Maybe<Scalars["Boolean"]>;
   changePassword?: Maybe<User>;
   forgotPassword?: Maybe<Scalars["Boolean"]>;
@@ -31,6 +32,10 @@ export type Mutation = {
 
 export type MutationCreatePostArgs = {
   data: PostInput;
+};
+
+export type MutationUploadPhotoArgs = {
+  file: Scalars["Upload"];
 };
 
 export type MutationConfirmUserArgs = {
@@ -82,6 +87,7 @@ export type PostInput = {
 };
 
 export type Query = {
+  posts: Array<Post>;
   getUser?: Maybe<User>;
   me?: Maybe<User>;
   helloWorld: Scalars["String"];
@@ -119,6 +125,31 @@ export type CreatePostMutation = { __typename?: "Mutation" } & {
     Post,
     "description" | "photoUrl" | "created_at" | "updated_at"
   > & { owner: { __typename?: "User" } & Pick<User, "id" | "email" | "name"> };
+};
+
+export type UploadPhotoMutationVariables = {
+  file: Scalars["Upload"];
+};
+
+export type UploadPhotoMutation = { __typename?: "Mutation" } & Pick<
+  Mutation,
+  "uploadPhoto"
+>;
+
+export type PostsQueryQueryVariables = {};
+
+export type PostsQueryQuery = { __typename?: "Query" } & {
+  posts: Array<
+    { __typename?: "Post" } & Pick<
+      Post,
+      "id" | "description" | "photoUrl" | "created_at" | "updated_at"
+    > & {
+        owner: { __typename?: "User" } & Pick<
+          User,
+          "id" | "firstName" | "email"
+        >;
+      }
+  >;
 };
 
 export type LoginMutationVariables = {
@@ -210,6 +241,101 @@ export function withCreatePost<TProps, TChildProps = {}>(
     CreatePostMutationVariables,
     CreatePostProps<TChildProps>
   >(CreatePostDocument, operationOptions);
+}
+export const UploadPhotoDocument = gql`
+  mutation UploadPhoto($file: Upload!) {
+    uploadPhoto(file: $file)
+  }
+`;
+
+export class UploadPhotoComponent extends React.Component<
+  Partial<
+    ReactApollo.MutationProps<UploadPhotoMutation, UploadPhotoMutationVariables>
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<UploadPhotoMutation, UploadPhotoMutationVariables>
+        mutation={UploadPhotoDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type UploadPhotoProps<TChildProps = {}> = Partial<
+  ReactApollo.MutateProps<UploadPhotoMutation, UploadPhotoMutationVariables>
+> &
+  TChildProps;
+export type UploadPhotoMutationFn = ReactApollo.MutationFn<
+  UploadPhotoMutation,
+  UploadPhotoMutationVariables
+>;
+export function withUploadPhoto<TProps, TChildProps = {}>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        UploadPhotoMutation,
+        UploadPhotoMutationVariables,
+        UploadPhotoProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.withMutation<
+    TProps,
+    UploadPhotoMutation,
+    UploadPhotoMutationVariables,
+    UploadPhotoProps<TChildProps>
+  >(UploadPhotoDocument, operationOptions);
+}
+export const PostsQueryDocument = gql`
+  query PostsQuery {
+    posts {
+      id
+      description
+      photoUrl
+      created_at
+      updated_at
+      owner {
+        id
+        firstName
+        email
+      }
+    }
+  }
+`;
+
+export class PostsQueryComponent extends React.Component<
+  Partial<ReactApollo.QueryProps<PostsQueryQuery, PostsQueryQueryVariables>>
+> {
+  render() {
+    return (
+      <ReactApollo.Query<PostsQueryQuery, PostsQueryQueryVariables>
+        query={PostsQueryDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type PostsQueryProps<TChildProps = {}> = Partial<
+  ReactApollo.DataProps<PostsQueryQuery, PostsQueryQueryVariables>
+> &
+  TChildProps;
+export function withPostsQuery<TProps, TChildProps = {}>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        PostsQueryQuery,
+        PostsQueryQueryVariables,
+        PostsQueryProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.withQuery<
+    TProps,
+    PostsQueryQuery,
+    PostsQueryQueryVariables,
+    PostsQueryProps<TChildProps>
+  >(PostsQueryDocument, operationOptions);
 }
 export const LoginDocument = gql`
   mutation Login($email: String!, $password: String!) {

@@ -25,6 +25,8 @@ const main = async () => {
    });
 
    const app = express();
+
+   app.use("/images", express.static("images"));
    const RedisStore = connectRedis(session);
    app.use(
       cors({
