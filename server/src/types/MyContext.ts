@@ -1,12 +1,8 @@
 import { Request, Response } from "express";
-import {
-   createAuthorsLoader,
-   createBooksLoader
-} from "../utilities/authorsLoader";
+import { createUserLoader } from "../utilities/usersLoader";
 
 export interface MyContext {
    req: Request;
    res: Response;
-   authorsLoader: ReturnType<typeof createAuthorsLoader>;
-   booksLoader: ReturnType<typeof createBooksLoader>; ///</typeof>
+   userLoader: ReturnType<typeof createUserLoader>;
 }

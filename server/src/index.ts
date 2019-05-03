@@ -8,10 +8,7 @@ import cors from "cors";
 
 import { redis } from "./redis";
 import { createSchema } from "./utilities/createSchema";
-import {
-   createAuthorsLoader,
-   createBooksLoader
-} from "./utilities/authorsLoader";
+import { createUserLoader } from "./utilities/usersLoader";
 
 const main = async () => {
    await createConnection();
@@ -23,8 +20,7 @@ const main = async () => {
       context: ({ req, res }: any) => ({
          req,
          res,
-         authorsLoader: createAuthorsLoader(),
-         booksLoader: createBooksLoader()
+         userLoader: createUserLoader()
       })
    });
 

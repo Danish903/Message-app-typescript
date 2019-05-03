@@ -7,10 +7,9 @@ import {
    CreateDateColumn,
    UpdateDateColumn
 } from "typeorm";
-import { ObjectType, Field, ID, Root, Ctx } from "type-graphql";
-import { AuthorBook } from "./AuthorBook";
-import { Book } from "./Book";
-import { MyContext } from "src/types/MyContext";
+import { ObjectType, Field, ID, Root } from "type-graphql";
+
+import { Post } from "./Post";
 
 @ObjectType()
 @Entity()
@@ -49,14 +48,8 @@ export class User extends BaseEntity {
    @Column({ default: "default" })
    bio: string;
 
-   @OneToMany(() => AuthorBook, ab => ab.user)
-   bookConnection: Promise<AuthorBook[]>;
-
-   @Field(() => [Book])
-   async books(@Ctx() ctx: MyContext): Promise<Book[]> {
-      // console.log("===========", ct);
-      return ctx.booksLoader.load(this.id);
-   }
+   @OneToMany(() => Post, post => post.user)
+   posts: Post[];
 
    @Field(() => Date)
    @CreateDateColumn()

@@ -6,14 +6,10 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
+  DateTime: any;
   /** The `Upload` scalar type represents a file upload. */
   Upload: any;
-};
-
-export type Book = {
-  id: Scalars["ID"];
-  name: Scalars["String"];
-  authors: Array<User>;
 };
 
 export type ChangePasswordInput = {
@@ -22,6 +18,7 @@ export type ChangePasswordInput = {
 };
 
 export type Mutation = {
+  createPost: Post;
   confirmUser?: Maybe<Scalars["Boolean"]>;
   changePassword?: Maybe<User>;
   forgotPassword?: Maybe<Scalars["Boolean"]>;
@@ -30,6 +27,10 @@ export type Mutation = {
   login?: Maybe<User>;
   addProfilePicture: Scalars["Boolean"];
   register: User;
+};
+
+export type MutationCreatePostArgs = {
+  data: PostInput;
 };
 
 export type MutationConfirmUserArgs = {
@@ -65,9 +66,29 @@ export type PasswordInput = {
   password: Scalars["String"];
 };
 
+export type Post = {
+  id: Scalars["ID"];
+  description: Scalars["String"];
+  photoUrl?: Maybe<Scalars["String"]>;
+  owner: User;
+  created_at: Scalars["DateTime"];
+  updated_at: Scalars["DateTime"];
+};
+
+export type PostInput = {
+  description: Scalars["String"];
+  photoUrl?: Maybe<Scalars["String"]>;
+  file?: Maybe<Scalars["Upload"]>;
+};
+
 export type Query = {
+  getUser?: Maybe<User>;
   me?: Maybe<User>;
   helloWorld: Scalars["String"];
+};
+
+export type QueryGetUserArgs = {
+  userId: Scalars["String"];
 };
 
 export type RegisterInput = {
@@ -81,12 +102,25 @@ export type RegisterInput = {
 export type User = {
   id: Scalars["ID"];
   firstName: Scalars["String"];
+  photo?: Maybe<Scalars["String"]>;
   lastName: Scalars["String"];
   email: Scalars["String"];
   name: Scalars["String"];
   bio: Scalars["String"];
-  books: Array<Book>;
+  created_at: Scalars["DateTime"];
+  updated_at: Scalars["DateTime"];
 };
+export type CreatePostMutationVariables = {
+  data: PostInput;
+};
+
+export type CreatePostMutation = { __typename?: "Mutation" } & {
+  createPost: { __typename?: "Post" } & Pick<
+    Post,
+    "description" | "photoUrl" | "created_at" | "updated_at"
+  > & { owner: { __typename?: "User" } & Pick<User, "id" | "email" | "name"> };
+};
+
 export type LoginMutationVariables = {
   email: Scalars["String"];
   password: Scalars["String"];
@@ -110,13 +144,73 @@ export type RegisterMutationMutation = { __typename?: "Mutation" } & {
 export type MeQueryVariables = {};
 
 export type MeQuery = { __typename?: "Query" } & {
-  me: Maybe<{ __typename?: "User" } & Pick<User, "id" | "email">>;
+  me: Maybe<
+    { __typename?: "User" } & Pick<
+      User,
+      "id" | "email" | "bio" | "name" | "photo"
+    >
+  >;
 };
 
 import gql from "graphql-tag";
 import * as React from "react";
 import * as ReactApollo from "react-apollo";
 
+export const CreatePostDocument = gql`
+  mutation CreatePost($data: PostInput!) {
+    createPost(data: $data) {
+      description
+      photoUrl
+      created_at
+      updated_at
+      owner {
+        id
+        email
+        name
+      }
+    }
+  }
+`;
+
+export class CreatePostComponent extends React.Component<
+  Partial<
+    ReactApollo.MutationProps<CreatePostMutation, CreatePostMutationVariables>
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<CreatePostMutation, CreatePostMutationVariables>
+        mutation={CreatePostDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type CreatePostProps<TChildProps = {}> = Partial<
+  ReactApollo.MutateProps<CreatePostMutation, CreatePostMutationVariables>
+> &
+  TChildProps;
+export type CreatePostMutationFn = ReactApollo.MutationFn<
+  CreatePostMutation,
+  CreatePostMutationVariables
+>;
+export function withCreatePost<TProps, TChildProps = {}>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        CreatePostMutation,
+        CreatePostMutationVariables,
+        CreatePostProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.withMutation<
+    TProps,
+    CreatePostMutation,
+    CreatePostMutationVariables,
+    CreatePostProps<TChildProps>
+  >(CreatePostDocument, operationOptions);
+}
 export const LoginDocument = gql`
   mutation Login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
@@ -228,6 +322,9 @@ export const MeDocument = gql`
     me {
       id
       email
+      bio
+      name
+      photo
     }
   }
 `;
