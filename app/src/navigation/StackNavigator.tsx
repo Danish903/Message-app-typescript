@@ -1,9 +1,5 @@
 import * as React from "react";
-import {
-   createStackNavigator,
-   createAppContainer,
-   NavigationStackScreenOptions
-} from "react-navigation";
+import { createStackNavigator } from "react-navigation";
 
 import Home from "../screens/Home";
 import Search from "../screens/Search";
@@ -15,13 +11,31 @@ import { Ionicons } from "@expo/vector-icons";
 import Camera from "../screens/Camera";
 import { NavigationScreenProps } from "react-navigation";
 
+export const CameraAndUploadStackNavigator = createStackNavigator(
+   {
+      Upload: {
+         screen: Upload
+      },
+      Camera: {
+         screen: Camera,
+         navigationOptions: {
+            header: null
+         }
+      }
+   },
+   {
+      initialRouteName: "Camera"
+   }
+);
 export const HomeNavigator = createStackNavigator({
    Home: {
       screen: Home,
       navigationOptions: ({ navigation }: NavigationScreenProps) => ({
          headerTitle: "Feed Screen",
          headerLeft: (
-            <TouchableOpacity onPress={() => navigation.navigate("Camera")}>
+            <TouchableOpacity
+               onPress={() => navigation.navigate("CameraAndUploadScreen")}
+            >
                <Ionicons
                   style={{ marginLeft: 10 }}
                   name="ios-camera"
@@ -40,8 +54,8 @@ export const HomeNavigator = createStackNavigator({
          )
       })
    },
-   Camera: {
-      screen: Camera,
+   CameraAndUploadScreen: {
+      screen: CameraAndUploadStackNavigator,
       navigationOptions: {
          header: null
       }
@@ -50,7 +64,11 @@ export const HomeNavigator = createStackNavigator({
 
 HomeNavigator.navigationOptions = ({ navigation }: NavigationScreenProps) => {
    let tabBarVisible = true;
-   if (navigation.state.routes.some(route => route.routeName === "Camera")) {
+   if (
+      navigation.state.routes.some(
+         route => route.routeName === "CameraAndUploadScreen"
+      )
+   ) {
       tabBarVisible = false;
    }
    return {

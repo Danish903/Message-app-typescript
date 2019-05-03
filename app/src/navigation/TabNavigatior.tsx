@@ -6,9 +6,10 @@ import {
    HomeNavigator,
    SearchNavigator,
    ProfileNavigator,
-   UploadNavigator,
    ActivityNavigator
 } from "./StackNavigator";
+import Profile from "../screens/Profile";
+import ImagePicker from "../screens/ImagePicker";
 
 const TabNavigator = createBottomTabNavigator(
    {
@@ -26,8 +27,8 @@ const TabNavigator = createBottomTabNavigator(
             tabBarIcon: () => <Ionicons name="ios-search" size={32} />
          }
       },
-      Upload: {
-         screen: UploadNavigator,
+      Image: {
+         screen: ImagePicker,
          navigationOptions: {
             tabBarLabel: " ",
             tabBarIcon: () => <Ionicons name="ios-add" size={32} />

@@ -25,16 +25,6 @@ const ImageURL =
 interface Props {}
 
 class Home extends React.PureComponent<Props & NavigationScreenProps> {
-   static navigationOptions = {
-      headerTitle: "Home",
-      headerRight: (
-         <Button
-            onPress={() => Alert.alert("This is a button!")}
-            title="Info"
-            color="#fff"
-         />
-      )
-   };
    render() {
       return (
          <PostsQueryComponent>

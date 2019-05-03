@@ -32,30 +32,29 @@ export default class CameraUpload extends Component<NavigationScreenProps> {
       const { status } = await Permissions.askAsync(Permissions.CAMERA);
       if (status === "granted") {
          const image = await this.camera.takePictureAsync();
-         console.log(image);
-         try {
-            const { uri } = await ImageManipulator.manipulateAsync(
-               image.uri,
-               [],
-               {
-                  format: "png",
-                  compress: 0.1
-               }
-            );
+         if (image.cancelled) return;
 
-            const file = new ReactNativeFile({
-               uri,
-               name: "picture.png",
-               type: "image/png"
+         const { uri } = await ImageManipulator.manipulateAsync(image.uri, [], {
+            format: "png",
+            compress: 0.1
+         });
+
+         const file = new ReactNativeFile({
+            uri,
+            name: "picture.png",
+            type: "image/png"
+         });
+         const res = await mutate({
+            variables: {
+               file
+            }
+         });
+         if (res && res.data && res.data.uploadPhoto) {
+            this.props.navigation.navigate("Upload", {
+               photoURL: res.data.uploadPhoto
             });
-            const res = await mutate({
-               variables: {
-                  file
-               }
-            });
-            if (res && res.data && res.data.uploadPhoto)
-               console.log(res.data.uploadPhoto);
-         } catch (error) {}
+            // console.log(res.data.uploadPhoto);
+         }
       }
    };
 
