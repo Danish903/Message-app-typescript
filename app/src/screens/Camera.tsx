@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, SafeAreaView, TouchableOpacity } from "react-native";
+import { SafeAreaView, TouchableOpacity } from "react-native";
 import { Camera, Permissions, CameraObject, ImageManipulator } from "expo";
 import { Ionicons } from "@expo/vector-icons";
 import { NavigationScreenProps } from "react-navigation";
@@ -72,7 +72,7 @@ export default class CameraUpload extends Component<NavigationScreenProps> {
                   <SafeAreaView style={{ flex: 1 }}>
                      <TouchableOpacity
                         style={{ paddingLeft: 30 }}
-                        onPress={() => this.props.navigation.goBack()}
+                        onPress={() => this.props.navigation.navigate("Home")}
                      >
                         <Ionicons
                            color={"white"}

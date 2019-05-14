@@ -51,20 +51,9 @@ class CreatePost {
       @Ctx() ctx: MyContext
    ): Promise<Post | null> {
       const userId = ctx.req.session!.userId;
-      let upload = undefined;
-      if (data.file) {
-         upload = await processFileUpload(
-            data.file.filename,
-            data.file.createReadStream
-         );
-      }
 
-      let imageName = undefined;
-      if (upload) {
-         imageName = upload.imageName;
-      }
       const post = await Post.create({
-         photoUrl: imageName,
+         photoUrl: data.photoUrl,
          description: data.description,
          userId
       }).save();

@@ -63,14 +63,18 @@ export const HomeNavigator = createStackNavigator({
 });
 
 HomeNavigator.navigationOptions = ({ navigation }: NavigationScreenProps) => {
-   let tabBarVisible = true;
-   if (
-      navigation.state.routes.some(
-         route => route.routeName === "CameraAndUploadScreen"
-      )
-   ) {
-      tabBarVisible = false;
-   }
+   // let tabBarVisible = true;
+   // if (
+   //    navigation.state.routes.some(
+   //       route => route.routeName === "CameraAndUploadScreen"
+   //    )
+   // ) {
+   //    tabBarVisible = false;
+   // }
+   const tabBarVisible = !navigation.state.routes.some(
+      route => route.routeName === "CameraAndUploadScreen"
+   );
+
    return {
       tabBarVisible
    };
