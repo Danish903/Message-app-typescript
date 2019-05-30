@@ -17,17 +17,27 @@ export type ChangePasswordInput = {
   token: Scalars["String"];
 };
 
+export type LoginResponse = {
+  user?: Maybe<User>;
+  token?: Maybe<Scalars["String"]>;
+};
+
 export type Mutation = {
-  createPost: Post;
+  login?: Maybe<LoginResponse>;
+  createPost?: Maybe<Post>;
   uploadPhoto: Scalars["String"];
   confirmUser?: Maybe<Scalars["Boolean"]>;
   changePassword?: Maybe<User>;
   forgotPassword?: Maybe<Scalars["Boolean"]>;
   logout: Scalars["Boolean"];
   createUser: User;
-  login?: Maybe<User>;
   addProfilePicture: Scalars["Boolean"];
   register: User;
+};
+
+export type MutationLoginArgs = {
+  password: Scalars["String"];
+  email: Scalars["String"];
 };
 
 export type MutationCreatePostArgs = {
@@ -54,11 +64,6 @@ export type MutationCreateUserArgs = {
   data: RegisterInput;
 };
 
-export type MutationLoginArgs = {
-  password: Scalars["String"];
-  email: Scalars["String"];
-};
-
 export type MutationAddProfilePictureArgs = {
   picture: Scalars["Upload"];
 };
@@ -74,6 +79,7 @@ export type PasswordInput = {
 export type Post = {
   id: Scalars["ID"];
   description: Scalars["String"];
+  city?: Maybe<Scalars["String"]>;
   photoUrl?: Maybe<Scalars["String"]>;
   owner: User;
   created_at: Scalars["DateTime"];
@@ -82,6 +88,7 @@ export type Post = {
 
 export type PostInput = {
   description: Scalars["String"];
+  city: Scalars["String"];
   photoUrl?: Maybe<Scalars["String"]>;
   file?: Maybe<Scalars["Upload"]>;
 };
@@ -121,10 +128,12 @@ export type CreatePostMutationVariables = {
 };
 
 export type CreatePostMutation = { __typename?: "Mutation" } & {
-  createPost: { __typename?: "Post" } & Pick<
-    Post,
-    "description" | "photoUrl" | "created_at" | "updated_at"
-  > & { owner: { __typename?: "User" } & Pick<User, "id" | "email" | "name"> };
+  createPost: Maybe<
+    { __typename?: "Post" } & Pick<
+      Post,
+      "description" | "photoUrl" | "created_at" | "updated_at"
+    > & { owner: { __typename?: "User" } & Pick<User, "id" | "email" | "name"> }
+  >;
 };
 
 export type UploadPhotoMutationVariables = {
@@ -158,7 +167,7 @@ export type LoginMutationVariables = {
 };
 
 export type LoginMutation = { __typename?: "Mutation" } & {
-  login: Maybe<{ __typename?: "User" } & Pick<User, "id" | "name" | "email">>;
+  login: Maybe<{ __typename?: "LoginResponse" } & Pick<LoginResponse, "token">>;
 };
 
 export type RegisterMutationMutationVariables = {
@@ -340,9 +349,7 @@ export function withPostsQuery<TProps, TChildProps = {}>(
 export const LoginDocument = gql`
   mutation Login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
-      id
-      name
-      email
+      token
     }
   }
 `;

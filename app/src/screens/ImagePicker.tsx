@@ -1,12 +1,12 @@
-import React, { Component } from "react";
-import { View, Text } from "react-native";
+import React, { Component } from 'react';
+import { View, Text, SafeAreaView } from 'react-native';
 
 export default class ImagePicker extends Component {
-   render() {
-      return (
-         <View>
-            <Text>Image picker</Text>
-         </View>
-      );
-   }
+  render() {
+    return (
+      <SafeAreaView>
+        <Text>Image picker</Text>
+      </SafeAreaView>
+    );
+  }
 }
