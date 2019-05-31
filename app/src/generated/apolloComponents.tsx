@@ -151,7 +151,7 @@ export type PostsQueryQuery = { __typename?: "Query" } & {
   posts: Array<
     { __typename?: "Post" } & Pick<
       Post,
-      "id" | "description" | "photoUrl" | "created_at" | "updated_at"
+      "id" | "description" | "photoUrl" | "city" | "created_at" | "updated_at"
     > & {
         owner: { __typename?: "User" } & Pick<
           User,
@@ -302,6 +302,7 @@ export const PostsQueryDocument = gql`
       id
       description
       photoUrl
+      city
       created_at
       updated_at
       owner {

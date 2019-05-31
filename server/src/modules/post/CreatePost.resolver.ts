@@ -75,6 +75,7 @@ class CreatePost {
     const post = await Post.create({
       photoUrl: data.photoUrl,
       description: data.description,
+      city: data.city,
       userId
     }).save();
 

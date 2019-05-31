@@ -5,11 +5,13 @@ import {
   BaseEntity,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToOne
+  ManyToOne,
+  OneToMany
 } from 'typeorm';
 import { ObjectType, Field, ID, Root, Ctx } from 'type-graphql';
 import { User } from './User';
 import { MyContext } from 'src/types/MyContext';
+import { PostLike } from './PostLike';
 
 @ObjectType()
 @Entity()
@@ -39,6 +41,13 @@ export class Post extends BaseEntity {
   async owner(@Root() parent: Post, @Ctx() ctx: MyContext): Promise<User> {
     return await ctx.userLoader.load(parent.userId);
   }
+
+  @Field()
+  @Column('int', { default: 0 })
+  likeCount: number;
+
+  @OneToMany(() => PostLike, postLike => postLike.post)
+  postLikes: PostLike[];
 
   @Field(() => Date)
   @CreateDateColumn()
