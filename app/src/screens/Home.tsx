@@ -13,10 +13,16 @@ import {
 } from 'react-native';
 import { styles } from '../styles/styles';
 
-import { PostsQueryComponent } from '../generated/apolloComponents';
+import {
+  PostsQueryComponent,
+  LikePostComponent,
+  MeComponent
+} from '../generated/apolloComponents';
 import { NavigationScreenProps } from 'react-navigation';
 import { FlatList } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
+import { ME_QUERY } from '../graphql/user/qureries/me';
+import { POSTS_QUERY } from '../graphql/post/queries/posts';
 
 const userImage =
   'https://www.thesun.co.uk/wp-content/uploads/2017/08/nintchdbpict000228849890.jpg?strip=all&w=456&quality=100';
@@ -25,8 +31,15 @@ const ImageURL =
 
 interface Props {}
 
+type userType = {
+  id: string;
+};
 class Home extends React.PureComponent<Props & NavigationScreenProps> {
   navigateMap = () => this.props.navigation.navigate('Map');
+
+  likePost = () => {
+    console.log('like post');
+  };
   render() {
     return (
       <PostsQueryComponent>
@@ -70,11 +83,39 @@ class Home extends React.PureComponent<Props & NavigationScreenProps> {
                       style={styles.postPhoto}
                     />
                     <View style={[styles.row]}>
-                      <Ionicons
-                        name="ios-heart-empty"
-                        size={25}
-                        style={{ padding: 5 }}
-                      />
+                      <MeComponent>
+                        {({ data }) => {
+                          let hasLiked = false;
+                          if (data && data.me && data.me.id) {
+                            hasLiked = post.likedUsers.some(
+                              (user: userType) => user.id === data.me!.id
+                            );
+                          }
+
+                          return (
+                            <LikePostComponent
+                              variables={{ postId: post.id }}
+                              refetchQueries={[{ query: POSTS_QUERY }]}
+                            >
+                              {likePost => (
+                                <TouchableOpacity
+                                  onPress={async () => await likePost()}
+                                >
+                                  <Ionicons
+                                    name={
+                                      hasLiked ? 'ios-heart' : 'ios-heart-empty'
+                                    }
+                                    size={25}
+                                    color={hasLiked ? '#fb3958' : 'black'}
+                                    style={{ padding: 5 }}
+                                  />
+                                </TouchableOpacity>
+                              )}
+                            </LikePostComponent>
+                          );
+                        }}
+                      </MeComponent>
+
                       <Ionicons
                         name="ios-chatbubbles"
                         size={25}

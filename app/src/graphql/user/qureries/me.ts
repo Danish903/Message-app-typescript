@@ -1,13 +1,16 @@
-import { gql } from "apollo-boost";
+import { gql } from 'apollo-boost';
 
 export const ME_QUERY = gql`
-   query ME {
-      me {
-         id
-         email
-         bio
-         name
-         photo
+  query ME {
+    me {
+      id
+      email
+      bio
+      name
+      photo
+      favoritePosts {
+        id
       }
-   }
+    }
+  }
 `;

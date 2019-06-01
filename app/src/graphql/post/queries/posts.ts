@@ -14,6 +14,9 @@ export const POSTS_QUERY = gql`
         firstName
         email
       }
+      likedUsers {
+        id
+      }
     }
   }
 `;

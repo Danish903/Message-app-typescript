@@ -25,6 +25,7 @@ export type LoginResponse = {
 export type Mutation = {
   login?: Maybe<LoginResponse>;
   createPost?: Maybe<Post>;
+  likePost?: Maybe<Scalars["Boolean"]>;
   uploadPhoto: Scalars["String"];
   confirmUser?: Maybe<Scalars["Boolean"]>;
   changePassword?: Maybe<User>;
@@ -42,6 +43,10 @@ export type MutationLoginArgs = {
 
 export type MutationCreatePostArgs = {
   data: PostInput;
+};
+
+export type MutationLikePostArgs = {
+  postId: Scalars["String"];
 };
 
 export type MutationUploadPhotoArgs = {
@@ -82,6 +87,8 @@ export type Post = {
   city?: Maybe<Scalars["String"]>;
   photoUrl?: Maybe<Scalars["String"]>;
   owner: User;
+  likeCount: Scalars["Float"];
+  likedUsers?: Maybe<Array<User>>;
   created_at: Scalars["DateTime"];
   updated_at: Scalars["DateTime"];
 };
@@ -91,6 +98,11 @@ export type PostInput = {
   city: Scalars["String"];
   photoUrl?: Maybe<Scalars["String"]>;
   file?: Maybe<Scalars["Upload"]>;
+};
+
+export type PostLike = {
+  created_at: Scalars["DateTime"];
+  updated_at: Scalars["DateTime"];
 };
 
 export type Query = {
@@ -120,6 +132,7 @@ export type User = {
   email: Scalars["String"];
   name: Scalars["String"];
   bio: Scalars["String"];
+  favoritePosts: Array<Post>;
   created_at: Scalars["DateTime"];
   updated_at: Scalars["DateTime"];
 };
@@ -135,6 +148,15 @@ export type CreatePostMutation = { __typename?: "Mutation" } & {
     > & { owner: { __typename?: "User" } & Pick<User, "id" | "email" | "name"> }
   >;
 };
+
+export type LikePostMutationVariables = {
+  postId: Scalars["String"];
+};
+
+export type LikePostMutation = { __typename?: "Mutation" } & Pick<
+  Mutation,
+  "likePost"
+>;
 
 export type UploadPhotoMutationVariables = {
   file: Scalars["Upload"];
@@ -157,6 +179,7 @@ export type PostsQueryQuery = { __typename?: "Query" } & {
           User,
           "id" | "firstName" | "email"
         >;
+        likedUsers: Maybe<Array<{ __typename?: "User" } & Pick<User, "id">>>;
       }
   >;
 };
@@ -188,7 +211,7 @@ export type MeQuery = { __typename?: "Query" } & {
     { __typename?: "User" } & Pick<
       User,
       "id" | "email" | "bio" | "name" | "photo"
-    >
+    > & { favoritePosts: Array<{ __typename?: "Post" } & Pick<Post, "id">> }
   >;
 };
 
@@ -251,6 +274,51 @@ export function withCreatePost<TProps, TChildProps = {}>(
     CreatePostProps<TChildProps>
   >(CreatePostDocument, operationOptions);
 }
+export const LikePostDocument = gql`
+  mutation LikePost($postId: String!) {
+    likePost(postId: $postId)
+  }
+`;
+
+export class LikePostComponent extends React.Component<
+  Partial<
+    ReactApollo.MutationProps<LikePostMutation, LikePostMutationVariables>
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<LikePostMutation, LikePostMutationVariables>
+        mutation={LikePostDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type LikePostProps<TChildProps = {}> = Partial<
+  ReactApollo.MutateProps<LikePostMutation, LikePostMutationVariables>
+> &
+  TChildProps;
+export type LikePostMutationFn = ReactApollo.MutationFn<
+  LikePostMutation,
+  LikePostMutationVariables
+>;
+export function withLikePost<TProps, TChildProps = {}>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        LikePostMutation,
+        LikePostMutationVariables,
+        LikePostProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.withMutation<
+    TProps,
+    LikePostMutation,
+    LikePostMutationVariables,
+    LikePostProps<TChildProps>
+  >(LikePostDocument, operationOptions);
+}
 export const UploadPhotoDocument = gql`
   mutation UploadPhoto($file: Upload!) {
     uploadPhoto(file: $file)
@@ -309,6 +377,9 @@ export const PostsQueryDocument = gql`
         id
         firstName
         email
+      }
+      likedUsers {
+        id
       }
     }
   }
@@ -459,6 +530,9 @@ export const MeDocument = gql`
       bio
       name
       photo
+      favoritePosts {
+        id
+      }
     }
   }
 `;

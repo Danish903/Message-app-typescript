@@ -58,7 +58,6 @@ export class User extends BaseEntity {
 
   @Field(() => [Post])
   async favoritePosts(@Ctx() ctx: MyContext): Promise<Post[]> {
-    // console.log("===========", ct);
     return ctx.postLoader.load(this.id);
   }
 

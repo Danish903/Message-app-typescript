@@ -10,6 +10,7 @@ import { redis } from './redis';
 import { createSchema } from './utilities/createSchema';
 import { createUserLoader } from './utilities/usersLoader';
 import { createPostsLoader } from './utilities/postLoader';
+import { createLikePostLoader } from './utilities/likedUsersLoader';
 
 const main = async () => {
   await createConnection();
@@ -22,7 +23,8 @@ const main = async () => {
       req,
       res,
       userLoader: createUserLoader(),
-      postLoader: createPostsLoader()
+      postLoader: createPostsLoader(),
+      likedUsersLoader: createLikePostLoader()
     })
   });
 

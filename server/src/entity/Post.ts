@@ -49,6 +49,11 @@ export class Post extends BaseEntity {
   @OneToMany(() => PostLike, postLike => postLike.post)
   postLikes: PostLike[];
 
+  @Field(() => [User], { nullable: true })
+  async likedUsers(@Ctx() ctx: MyContext): Promise<User[]> {
+    return ctx.likedUsersLoader.load(this.id);
+  }
+
   @Field(() => Date)
   @CreateDateColumn()
   created_at: Date;

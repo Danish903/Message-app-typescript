@@ -5,16 +5,37 @@ import { In } from 'typeorm';
 
 const batchPosts = async (userIds: string[]) => {
   const pLikes = await PostLike.find({
-    join: {
-      alias: 'plike',
-      innerJoinAndSelect: {
-        post: 'plike.post'
-      }
-    },
     where: {
       userId: In(userIds)
-    }
+    },
+    relations: ['post']
   });
+
+  //   console.log(pLikes);
+
+  // OR
+
+  //   const posts = await getConnection()
+  //     .getRepository(Post)
+  //     .createQueryBuilder('p')
+  //     .leftJoin(PostLike, 'pl', 'pl."postId" = p.id')
+  //     .where('pl."userId" = :userId', { userId: userIds[0] })
+  //     .getMany();
+  //   console.log(posts);
+
+  // OR
+
+  //   const pLikes = await PostLike.find({
+  //     join: {
+  //       alias: 'plike',
+  //       innerJoinAndSelect: {
+  //         post: 'plike.post'
+  //       }
+  //     },
+  //     where: {
+  //       userId: In(userIds)
+  //     }
+  //   });
 
   const postIdToUsers: { [key: string]: Post[] } = {};
   pLikes.forEach(pL => {

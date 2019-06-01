@@ -9,7 +9,7 @@ import { PostLike } from '../../entity/PostLike';
 class LikePost {
   @UseMiddleware(isAuth)
   @Mutation(() => Boolean, { nullable: true })
-  async LikePost(
+  async likePost(
     @Arg('postId') postId: string,
     @Ctx() ctx: MyContext
   ): Promise<boolean> {
@@ -17,15 +17,32 @@ class LikePost {
     if (!userId) throw new Error('You are not authenticated');
     const post = await Post.findOne(postId);
     if (!post) throw new Error("Post doesn't exist");
-    await PostLike.create({ userId, postId }).save();
-    await Post.update(
-      {
-        id: postId
-      },
-      {
-        likeCount: post.likeCount + 1
-      }
-    );
+
+    const postIsAlreadyLiked = await PostLike.find({ userId, postId });
+    if (postIsAlreadyLiked.length > 0) {
+      // unlike the post
+      await PostLike.delete({ userId, postId });
+      await Post.update(
+        {
+          id: postId
+        },
+        {
+          likeCount: post.likeCount - 1
+        }
+      );
+    } else {
+      // like the post
+      await PostLike.create({ userId, postId }).save();
+      await Post.update(
+        {
+          id: postId
+        },
+        {
+          likeCount: post.likeCount + 1
+        }
+      );
+    }
+
     return true;
   }
 }
