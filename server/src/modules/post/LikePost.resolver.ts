@@ -32,12 +32,12 @@ class LikePost {
         }
       );
 
-      await Activity.create({
+      await Activity.delete({
         userId: post.userId,
         senderId: userId,
-        type: 'UnLike',
+        type: 'Like',
         postId: post.id
-      }).save();
+      });
     } else {
       // like the post
       await PostLike.create({ userId, postId }).save();
@@ -49,7 +49,6 @@ class LikePost {
           likeCount: post.likeCount + 1
         }
       );
-
       await Activity.create({
         userId: post.userId,
         senderId: userId,

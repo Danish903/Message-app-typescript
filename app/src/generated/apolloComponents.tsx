@@ -12,6 +12,15 @@ export type Scalars = {
   Upload: any;
 };
 
+export type Activity = {
+  id: Scalars["ID"];
+  sender: User;
+  post: Post;
+  type: Scalars["String"];
+  created_at: Scalars["DateTime"];
+  updated_at: Scalars["DateTime"];
+};
+
 export type ChangePasswordInput = {
   password: Scalars["String"];
   token: Scalars["String"];
@@ -106,6 +115,7 @@ export type PostLike = {
 };
 
 export type Query = {
+  activities: Array<Activity>;
   posts: Array<Post>;
   getUser?: Maybe<User>;
   me?: Maybe<User>;
@@ -136,6 +146,20 @@ export type User = {
   created_at: Scalars["DateTime"];
   updated_at: Scalars["DateTime"];
 };
+export type AcitivityQueryQueryVariables = {};
+
+export type AcitivityQueryQuery = { __typename?: "Query" } & {
+  activities: Array<
+    { __typename?: "Activity" } & Pick<
+      Activity,
+      "id" | "type" | "created_at"
+    > & {
+        post: { __typename?: "Post" } & Pick<Post, "id" | "photoUrl">;
+        sender: { __typename?: "User" } & Pick<User, "id" | "name">;
+      }
+  >;
+};
+
 export type CreatePostMutationVariables = {
   data: PostInput;
 };
@@ -219,6 +243,59 @@ import gql from "graphql-tag";
 import * as React from "react";
 import * as ReactApollo from "react-apollo";
 
+export const AcitivityQueryDocument = gql`
+  query AcitivityQuery {
+    activities {
+      id
+      type
+      post {
+        id
+        photoUrl
+      }
+      sender {
+        id
+        name
+      }
+      created_at
+    }
+  }
+`;
+
+export class AcitivityQueryComponent extends React.Component<
+  Partial<
+    ReactApollo.QueryProps<AcitivityQueryQuery, AcitivityQueryQueryVariables>
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Query<AcitivityQueryQuery, AcitivityQueryQueryVariables>
+        query={AcitivityQueryDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type AcitivityQueryProps<TChildProps = {}> = Partial<
+  ReactApollo.DataProps<AcitivityQueryQuery, AcitivityQueryQueryVariables>
+> &
+  TChildProps;
+export function withAcitivityQuery<TProps, TChildProps = {}>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        AcitivityQueryQuery,
+        AcitivityQueryQueryVariables,
+        AcitivityQueryProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.withQuery<
+    TProps,
+    AcitivityQueryQuery,
+    AcitivityQueryQueryVariables,
+    AcitivityQueryProps<TChildProps>
+  >(AcitivityQueryDocument, operationOptions);
+}
 export const CreatePostDocument = gql`
   mutation CreatePost($data: PostInput!) {
     createPost(data: $data) {

@@ -23,10 +23,11 @@ import { FlatList } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { ME_QUERY } from '../graphql/user/qureries/me';
 import { POSTS_QUERY } from '../graphql/post/queries/posts';
+import { ACTIVITIETS_QUERY } from '../graphql/activity/queries/activitites';
 
-const userImage =
+export const userImage =
   'https://www.thesun.co.uk/wp-content/uploads/2017/08/nintchdbpict000228849890.jpg?strip=all&w=456&quality=100';
-const ImageURL =
+export const ImageURL =
   'https://images.unsplash.com/photo-1550007488-acbcd2b1be4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60';
 
 interface Props {}
@@ -94,7 +95,10 @@ class Home extends React.PureComponent<Props & NavigationScreenProps> {
                           return (
                             <LikePostComponent
                               variables={{ postId: post.id }}
-                              refetchQueries={[{ query: POSTS_QUERY }]}
+                              refetchQueries={[
+                                { query: POSTS_QUERY },
+                                { query: ACTIVITIETS_QUERY }
+                              ]}
                             >
                               {likePost => (
                                 <TouchableOpacity

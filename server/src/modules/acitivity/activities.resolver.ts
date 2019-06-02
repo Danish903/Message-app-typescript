@@ -11,7 +11,10 @@ export default class ActivityQuery {
 
     const activities = await Activity.find({
       where: { userId },
-      relations: ['sender', 'post']
+      relations: ['sender', 'post'],
+      order: {
+        created_at: 'DESC'
+      }
     });
 
     return activities;

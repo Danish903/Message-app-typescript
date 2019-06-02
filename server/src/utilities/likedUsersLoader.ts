@@ -11,7 +11,6 @@ const batchUsers = async (postIds: string[]) => {
     },
     relations: ['user']
   });
-  console.log(pLikes);
 
   const postIdToUsers: { [key: string]: User[] } = {};
   pLikes.forEach(pL => {
@@ -21,7 +20,6 @@ const batchUsers = async (postIds: string[]) => {
       postIdToUsers[pL.postId] = [pL.user as User];
     }
   });
-  console.log(postIdToUsers);
 
   return postIds.map(postId => postIdToUsers[postId] || []);
 };
