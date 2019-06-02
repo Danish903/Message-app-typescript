@@ -11,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Camera from '../screens/Camera';
 import { NavigationScreenProps } from 'react-navigation';
 import Map from '../screens/Map';
+import EditProfile from '../screens/EditProfile';
 
 export const CameraAndUploadStackNavigator = createStackNavigator(
   {
@@ -119,5 +120,20 @@ export const ProfileNavigator = createStackNavigator({
     navigationOptions: {
       title: 'Profile'
     }
+  },
+  EditProfile: {
+    screen: EditProfile,
+    navigationOptions: ({ navigation }: NavigationScreenProps) => ({
+      title: 'Edit Profile',
+      headerLeft: (
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons
+            style={{ paddingLeft: 10 }}
+            name={'ios-arrow-back'}
+            size={30}
+          />
+        </TouchableOpacity>
+      )
+    })
   }
 });

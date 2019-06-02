@@ -22,7 +22,7 @@ type registerMutationType = MutationFn<
   RegisterMutationMutation,
   RegisterMutationMutationVariables
 >;
-class Signup extends React.PureComponent<Props, SignupState> {
+class EditProfile extends React.PureComponent<Props, SignupState> {
   static navigationOptions = {
     title: 'Signup'
   };
@@ -36,7 +36,7 @@ class Signup extends React.PureComponent<Props, SignupState> {
   handleSignup = async (register: registerMutationType) => {
     const { email, password, firstName, lastName, bio } = this.state;
     try {
-      await register({
+      const res = await register({
         variables: {
           data: { email, password, firstName, lastName, bio }
         }
@@ -96,7 +96,7 @@ class Signup extends React.PureComponent<Props, SignupState> {
               onPress={() => this.handleSignup(register)}
               style={styles.button}
             >
-              <Text>Signup</Text>
+              <Text>Edit and Save</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -105,4 +105,4 @@ class Signup extends React.PureComponent<Props, SignupState> {
   }
 }
 
-export default Signup;
+export default EditProfile;

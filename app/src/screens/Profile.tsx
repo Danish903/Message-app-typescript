@@ -25,6 +25,10 @@ class Profile extends React.PureComponent<
     this.props.navigation.navigate('Login');
     client.resetStore();
   };
+
+  componentWillUnmount() {
+    console.log('componnent unmount');
+  }
   render() {
     return (
       <MeComponent>
@@ -50,6 +54,17 @@ class Profile extends React.PureComponent<
               <Text> {me.email} </Text>
               <Text> {me.name} </Text>
               <Text> {me.bio}</Text>
+
+              <TouchableOpacity
+                onPress={() =>
+                  this.props.navigation.navigate('EditProfile', {
+                    title: 'Edit Profile '
+                  })
+                }
+                style={styles.button}
+              >
+                <Text>Edit Profile</Text>
+              </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => this.handleLogout(client)}
                 style={styles.button}
