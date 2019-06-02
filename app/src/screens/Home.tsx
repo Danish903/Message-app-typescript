@@ -91,7 +91,6 @@ class Home extends React.PureComponent<Props & NavigationScreenProps> {
                               (user: userType) => user.id === data.me!.id
                             );
                           }
-
                           return (
                             <LikePostComponent
                               variables={{ postId: post.id }}

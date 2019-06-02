@@ -12,6 +12,7 @@ import { ObjectType, Field, ID, Root, Ctx } from 'type-graphql';
 import { Post } from './Post';
 import { PostLike } from './PostLike';
 import { MyContext } from '../types/MyContext';
+import { Activity } from './Activity';
 
 @ObjectType()
 @Entity()
@@ -55,6 +56,12 @@ export class User extends BaseEntity {
 
   @OneToMany(() => PostLike, postLike => postLike.user)
   userLikes: PostLike[];
+
+  @OneToMany(() => Activity, activity => activity.user)
+  userActivities: Activity[];
+
+  @OneToMany(() => Activity, activity => activity.sender)
+  activitySender: Activity[];
 
   @Field(() => [Post])
   async favoritePosts(@Ctx() ctx: MyContext): Promise<Post[]> {

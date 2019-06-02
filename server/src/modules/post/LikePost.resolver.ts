@@ -4,6 +4,7 @@ import { Post } from '../../entity/Post';
 import { getUserId } from './CreatePost.resolver';
 import { MyContext } from '../../types/MyContext';
 import { PostLike } from '../../entity/PostLike';
+import { Activity } from '../../entity/Activity';
 
 @Resolver()
 class LikePost {
@@ -30,6 +31,13 @@ class LikePost {
           likeCount: post.likeCount - 1
         }
       );
+
+      await Activity.create({
+        userId: post.userId,
+        senderId: userId,
+        type: 'UnLike',
+        postId: post.id
+      }).save();
     } else {
       // like the post
       await PostLike.create({ userId, postId }).save();
@@ -41,6 +49,13 @@ class LikePost {
           likeCount: post.likeCount + 1
         }
       );
+
+      await Activity.create({
+        userId: post.userId,
+        senderId: userId,
+        type: 'Like',
+        postId: post.id
+      }).save();
     }
 
     return true;

@@ -12,6 +12,7 @@ import { ObjectType, Field, ID, Root, Ctx } from 'type-graphql';
 import { User } from './User';
 import { MyContext } from 'src/types/MyContext';
 import { PostLike } from './PostLike';
+import { Activity } from './Activity';
 
 @ObjectType()
 @Entity()
@@ -53,6 +54,9 @@ export class Post extends BaseEntity {
   async likedUsers(@Ctx() ctx: MyContext): Promise<User[]> {
     return ctx.likedUsersLoader.load(this.id);
   }
+
+  @OneToMany(() => Activity, activity => activity.post)
+  postActivities: Activity[];
 
   @Field(() => Date)
   @CreateDateColumn()
