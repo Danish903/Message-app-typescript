@@ -1,75 +1,139 @@
 import * as React from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  Image
+} from 'react-native';
 import { styles } from '../styles/styles';
 import { NavigationScreenProps } from 'react-navigation';
 import {
-  RegisterMutationComponent,
-  RegisterMutationMutation,
-  RegisterMutationMutationVariables
+  EditProfileComponent,
+  EditProfileMutation,
+  EditProfileMutationVariables,
+  MeQuery
 } from '../generated/apolloComponents';
-import { MutationFn } from 'react-apollo';
+import { MutationFn, MutationUpdaterFn } from 'react-apollo';
+import { userImage } from './Home';
+import { Permissions, ImagePicker } from 'expo';
+import { ReactNativeFile } from 'apollo-upload-client';
+import { ME_QUERY } from '../graphql/user/qureries/me';
 
 interface Props extends NavigationScreenProps {}
 
 export interface SignupState {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  bio: string;
+  firstName?: string;
+  lastName?: string;
+  bio?: string;
+  profilePicture?: ReactNativeFile;
+  photo: string;
 }
-type registerMutationType = MutationFn<
-  RegisterMutationMutation,
-  RegisterMutationMutationVariables
+type editProfileMutationType = MutationFn<
+  EditProfileMutation,
+  EditProfileMutationVariables
 >;
 class EditProfile extends React.PureComponent<Props, SignupState> {
   static navigationOptions = {
     title: 'Signup'
   };
   state: SignupState = {
-    email: '',
-    password: '',
     firstName: '',
     lastName: '',
-    bio: ''
+    bio: '',
+    profilePicture: undefined,
+    photo: ''
   };
-  handleSignup = async (register: registerMutationType) => {
-    const { email, password, firstName, lastName, bio } = this.state;
-    try {
-      const res = await register({
-        variables: {
-          data: { email, password, firstName, lastName, bio }
-        }
+
+  componentDidMount() {
+    const { navigation } = this.props;
+    this.setState({
+      firstName: navigation.getParam('firstName'),
+      lastName: navigation.getParam('lastName'),
+      bio: navigation.getParam('bio'),
+      photo: navigation.getParam('photo')
+    });
+  }
+  openCameraRoll = async () => {
+    const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+    if (status === 'granted') {
+      const image = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [1, 1]
       });
-    } catch (error) {
-      console.log(error);
-      Alert.alert('Signup failed', 'Ooops! something went wrong signing up');
+      if (!image.cancelled) {
+        const { uri } = image;
+        const profilePicture = new ReactNativeFile({
+          uri,
+          name: 'profilePitcure.png',
+          type: 'image/png'
+        });
+        this.setState({
+          profilePicture,
+          photo: uri
+        });
+      }
     }
   };
-  render() {
-    const { email, password, firstName, lastName, bio } = this.state;
-    const { navigation } = this.props;
-    const title = navigation.getParam('title');
-    return (
-      <RegisterMutationComponent>
-        {register => (
-          <View style={styles.container}>
-            <TextInput
-              style={styles.border}
-              value={email}
-              onChangeText={(value: string) => this.setState({ email: value })}
-              placeholder="Email"
-            />
-            <TextInput
-              style={styles.border}
-              value={password}
-              onChangeText={(value: string) =>
-                this.setState({ password: value })
-              }
-              placeholder="Password"
-              secureTextEntry
-            />
+  handleEditProfile = async (editProfile: editProfileMutationType) => {
+    try {
+      const { firstName, lastName, bio, profilePicture } = this.state;
+      await editProfile({
+        variables: {
+          data: {
+            firstName,
+            lastName,
+            bio,
+            profilePicture
+          }
+        }
+      });
 
+      Alert.alert(
+        'Updated',
+        'Your profile has been updated!',
+        [{ text: 'OK', onPress: () => this.props.navigation.goBack() }],
+        { cancelable: false }
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  updateCache: MutationUpdaterFn<EditProfileMutation> = (
+    cache,
+    { data: editProfile }
+  ) => {
+    const data = cache.readQuery<MeQuery>({
+      query: ME_QUERY
+    });
+    if (!data || !data.me || !editProfile) return;
+    data.me = {
+      ...data.me,
+      ...editProfile.editProfile
+    };
+    cache.writeQuery<MeQuery>({
+      query: ME_QUERY,
+      data
+    });
+  };
+  render() {
+    const { firstName, lastName, bio, photo } = this.state;
+
+    return (
+      <EditProfileComponent update={this.updateCache}>
+        {editProfile => (
+          <View style={styles.container}>
+            <TouchableOpacity onPress={this.openCameraRoll}>
+              <View style={{ alignItems: 'center' }}>
+                <Image
+                  style={styles.roundImage}
+                  source={{ uri: photo ? photo : userImage }}
+                />
+                <Text>Upload Photo</Text>
+              </View>
+            </TouchableOpacity>
             <TextInput
               style={styles.border}
               value={firstName}
@@ -93,14 +157,14 @@ class EditProfile extends React.PureComponent<Props, SignupState> {
               placeholder="Bio"
             />
             <TouchableOpacity
-              onPress={() => this.handleSignup(register)}
+              onPress={() => this.handleEditProfile(editProfile)}
               style={styles.button}
             >
               <Text>Edit and Save</Text>
             </TouchableOpacity>
           </View>
         )}
-      </RegisterMutationComponent>
+      </EditProfileComponent>
     );
   }
 }

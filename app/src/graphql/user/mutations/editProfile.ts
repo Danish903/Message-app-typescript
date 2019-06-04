@@ -1,8 +1,8 @@
 import { gql } from 'apollo-boost';
 
-export const ME_QUERY = gql`
-  query ME {
-    me {
+export const EDIT_PROFILE_MUTATION = gql`
+  mutation EditProfile($data: EditProfileInput!) {
+    editProfile(data: $data) {
       id
       email
       bio

@@ -5,7 +5,7 @@ import { JWT_SECRET } from '../user/Login.resolver';
 
 export const isAuth: MiddlewareFn<MyContext> = async ({ context }, next) => {
   const header = context.req.headers.authorization || '';
-  //   console.log(header);
+  console.log('CALLLEDDDDDDD');
   if (!header) {
     throw new Error('You must be authenticated!');
   }

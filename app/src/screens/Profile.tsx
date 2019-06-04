@@ -33,7 +33,6 @@ class Profile extends React.PureComponent<
     return (
       <MeComponent>
         {({ client, data, loading }) => {
-          console.log(data!.me);
           if (!data && !data!.me) return <Text>You are not authenticated</Text>;
           let me: any = {};
           if (data && data.me) {
@@ -50,7 +49,6 @@ class Profile extends React.PureComponent<
                 }}
                 style={{ width: 50, height: 50 }}
               />
-              <Text> {me.id}</Text>
               <Text> {me.email} </Text>
               <Text> {me.name} </Text>
               <Text> {me.bio}</Text>
@@ -58,7 +56,11 @@ class Profile extends React.PureComponent<
               <TouchableOpacity
                 onPress={() =>
                   this.props.navigation.navigate('EditProfile', {
-                    title: 'Edit Profile '
+                    title: 'Edit Profile ',
+                    firstName: me.firstName,
+                    lastName: me.lastName,
+                    bio: me.bio,
+                    photo: me.photo
                   })
                 }
                 style={styles.button}

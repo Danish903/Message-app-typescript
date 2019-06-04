@@ -13,6 +13,7 @@ export const POSTS_QUERY = gql`
         id
         firstName
         email
+        photo
       }
       likedUsers {
         id

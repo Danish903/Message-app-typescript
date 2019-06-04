@@ -26,6 +26,13 @@ export type ChangePasswordInput = {
   token: Scalars["String"];
 };
 
+export type EditProfileInput = {
+  firstName?: Maybe<Scalars["String"]>;
+  lastName?: Maybe<Scalars["String"]>;
+  bio?: Maybe<Scalars["String"]>;
+  profilePicture?: Maybe<Scalars["Upload"]>;
+};
+
 export type LoginResponse = {
   user?: Maybe<User>;
   token?: Maybe<Scalars["String"]>;
@@ -41,6 +48,7 @@ export type Mutation = {
   forgotPassword?: Maybe<Scalars["Boolean"]>;
   logout: Scalars["Boolean"];
   createUser: User;
+  editProfile: User;
   addProfilePicture: Scalars["Boolean"];
   register: User;
 };
@@ -76,6 +84,10 @@ export type MutationForgotPasswordArgs = {
 
 export type MutationCreateUserArgs = {
   data: RegisterInput;
+};
+
+export type MutationEditProfileArgs = {
+  data: EditProfileInput;
 };
 
 export type MutationAddProfilePictureArgs = {
@@ -201,11 +213,22 @@ export type PostsQueryQuery = { __typename?: "Query" } & {
     > & {
         owner: { __typename?: "User" } & Pick<
           User,
-          "id" | "firstName" | "email"
+          "id" | "firstName" | "email" | "photo"
         >;
         likedUsers: Maybe<Array<{ __typename?: "User" } & Pick<User, "id">>>;
       }
   >;
+};
+
+export type EditProfileMutationVariables = {
+  data: EditProfileInput;
+};
+
+export type EditProfileMutation = { __typename?: "Mutation" } & {
+  editProfile: { __typename?: "User" } & Pick<
+    User,
+    "id" | "email" | "bio" | "name" | "firstName" | "lastName" | "photo"
+  > & { favoritePosts: Array<{ __typename?: "Post" } & Pick<Post, "id">> };
 };
 
 export type LoginMutationVariables = {
@@ -234,7 +257,7 @@ export type MeQuery = { __typename?: "Query" } & {
   me: Maybe<
     { __typename?: "User" } & Pick<
       User,
-      "id" | "email" | "bio" | "name" | "photo"
+      "id" | "email" | "bio" | "name" | "firstName" | "lastName" | "photo"
     > & { favoritePosts: Array<{ __typename?: "Post" } & Pick<Post, "id">> }
   >;
 };
@@ -454,6 +477,7 @@ export const PostsQueryDocument = gql`
         id
         firstName
         email
+        photo
       }
       likedUsers {
         id
@@ -494,6 +518,62 @@ export function withPostsQuery<TProps, TChildProps = {}>(
     PostsQueryQueryVariables,
     PostsQueryProps<TChildProps>
   >(PostsQueryDocument, operationOptions);
+}
+export const EditProfileDocument = gql`
+  mutation EditProfile($data: EditProfileInput!) {
+    editProfile(data: $data) {
+      id
+      email
+      bio
+      name
+      firstName
+      lastName
+      photo
+      favoritePosts {
+        id
+      }
+    }
+  }
+`;
+
+export class EditProfileComponent extends React.Component<
+  Partial<
+    ReactApollo.MutationProps<EditProfileMutation, EditProfileMutationVariables>
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<EditProfileMutation, EditProfileMutationVariables>
+        mutation={EditProfileDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type EditProfileProps<TChildProps = {}> = Partial<
+  ReactApollo.MutateProps<EditProfileMutation, EditProfileMutationVariables>
+> &
+  TChildProps;
+export type EditProfileMutationFn = ReactApollo.MutationFn<
+  EditProfileMutation,
+  EditProfileMutationVariables
+>;
+export function withEditProfile<TProps, TChildProps = {}>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        EditProfileMutation,
+        EditProfileMutationVariables,
+        EditProfileProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.withMutation<
+    TProps,
+    EditProfileMutation,
+    EditProfileMutationVariables,
+    EditProfileProps<TChildProps>
+  >(EditProfileDocument, operationOptions);
 }
 export const LoginDocument = gql`
   mutation Login($email: String!, $password: String!) {
@@ -606,6 +686,8 @@ export const MeDocument = gql`
       email
       bio
       name
+      firstName
+      lastName
       photo
       favoritePosts {
         id

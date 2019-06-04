@@ -38,9 +38,6 @@ type userType = {
 class Home extends React.PureComponent<Props & NavigationScreenProps> {
   navigateMap = () => this.props.navigation.navigate('Map');
 
-  likePost = () => {
-    console.log('like post');
-  };
   render() {
     return (
       <PostsQueryComponent>
@@ -58,7 +55,7 @@ class Home extends React.PureComponent<Props & NavigationScreenProps> {
                       <View style={[styles.row, styles.center]}>
                         <Image
                           source={{
-                            uri: userImage
+                            uri: post.owner.photo || userImage
                           }}
                           style={styles.roundImage}
                         />

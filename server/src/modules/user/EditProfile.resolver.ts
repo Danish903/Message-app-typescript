@@ -15,7 +15,7 @@ import { getUserId, processFileUpload } from '../post/CreatePost.resolver';
 import { User } from '../../entity/User';
 
 @InputType()
-export class editProfileInput {
+export class EditProfileInput {
   @Field({ nullable: true })
   firstName?: string;
   @Field({ nullable: true })
@@ -31,24 +31,28 @@ export class editProfileInput {
 @Resolver()
 class EditProfile {
   @UseMiddleware(isAuth)
-  @Mutation(() => Boolean)
+  @Mutation(() => User)
   async editProfile(
-    @Arg('data') data: editProfileInput,
+    @Arg('data') data: EditProfileInput,
     @Ctx() ctx: MyContext
-  ): Promise<Boolean> {
+  ): Promise<User> {
     const userId = getUserId(ctx);
+
     if (!userId) throw new Error('You are not authenticated to edit profile!');
     let photo = undefined;
     if (data.profilePicture) {
-      const { createReadStream, filename } = data.profilePicture;
+      const { createReadStream, filename } = await data.profilePicture;
+
       const response = await processFileUpload(filename, createReadStream);
       photo = `http://localhost:4000/images/${response!.imageName}`;
+      data.photo = photo;
     }
     delete data.profilePicture;
-    data.photo = photo;
 
     await User.update({ id: userId }, { ...data });
-    return true;
+    const user = await User.findOne(userId);
+    if (!user) throw new Error('user not found');
+    return user;
   }
 }
 
