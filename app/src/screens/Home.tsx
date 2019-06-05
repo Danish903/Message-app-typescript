@@ -115,12 +115,20 @@ class Home extends React.PureComponent<Props & NavigationScreenProps> {
                           );
                         }}
                       </MeComponent>
+                      <TouchableOpacity
+                        onPress={() =>
+                          this.props.navigation.navigate('Comment', {
+                            postId: post.id
+                          })
+                        }
+                      >
+                        <Ionicons
+                          name="ios-chatbubbles"
+                          size={25}
+                          style={{ padding: 5 }}
+                        />
+                      </TouchableOpacity>
 
-                      <Ionicons
-                        name="ios-chatbubbles"
-                        size={25}
-                        style={{ padding: 5 }}
-                      />
                       <Ionicons
                         name="ios-send"
                         size={25}

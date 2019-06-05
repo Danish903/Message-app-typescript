@@ -5,18 +5,19 @@ import { createConnection } from 'typeorm';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
 import cors from 'cors';
+import http from 'http';
 
-import { redis } from './redis';
+import { redis, pubSub } from './redis';
 import { createSchema } from './utilities/createSchema';
 import { createUserLoader } from './utilities/usersLoader';
 import { createPostsLoader } from './utilities/postLoader';
 import { createLikePostLoader } from './utilities/likedUsersLoader';
 
+const PORT = process.env.PORT || 4000;
+
 const main = async () => {
   await createConnection();
-
   const schema = await createSchema();
-
   const server = new ApolloServer({
     schema,
     context: ({ req, res }: any) => ({
@@ -24,7 +25,8 @@ const main = async () => {
       res,
       userLoader: createUserLoader(),
       postLoader: createPostsLoader(),
-      likedUsersLoader: createLikePostLoader()
+      likedUsersLoader: createLikePostLoader(),
+      pubSub
     })
   });
 
@@ -58,9 +60,18 @@ const main = async () => {
   );
 
   server.applyMiddleware({ app, cors: false });
+  const httpServer = http.createServer(app);
+  server.installSubscriptionHandlers(httpServer);
 
-  app.listen({ port: process.env.PORT || 4000 }, () =>
-    console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)
-  );
+  httpServer.listen(PORT, () => {
+    console.log(
+      `🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`
+    );
+    console.log(
+      `🚀 Subscriptions ready at ws://localhost:${PORT}${
+        server.subscriptionsPath
+      }`
+    );
+  });
 };
 main();

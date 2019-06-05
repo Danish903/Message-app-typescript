@@ -12,11 +12,24 @@ import Camera from '../screens/Camera';
 import { NavigationScreenProps } from 'react-navigation';
 import Map from '../screens/Map';
 import EditProfile from '../screens/EditProfile';
+import Comment from '../screens/Comment';
 
 export const CameraAndUploadStackNavigator = createStackNavigator(
   {
     Upload: {
-      screen: Upload
+      screen: Upload,
+      navigationOptions: ({ navigation }: NavigationScreenProps) => ({
+        title: 'Create Post',
+        headerLeft: (
+          <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+            <Ionicons
+              style={{ paddingLeft: 10 }}
+              name={'ios-arrow-back'}
+              size={30}
+            />
+          </TouchableOpacity>
+        )
+      })
     },
     Camera: {
       screen: Camera,
@@ -68,6 +81,21 @@ export const HomeNavigator = createStackNavigator({
     navigationOptions: {
       header: null
     }
+  },
+  Comment: {
+    screen: Comment,
+    navigationOptions: ({ navigation }: NavigationScreenProps) => ({
+      title: 'Comments',
+      headerLeft: (
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons
+            style={{ paddingLeft: 10 }}
+            name={'ios-arrow-back'}
+            size={30}
+          />
+        </TouchableOpacity>
+      )
+    })
   }
 });
 
@@ -82,7 +110,9 @@ HomeNavigator.navigationOptions = ({ navigation }: NavigationScreenProps) => {
   // }
   const tabBarVisible = !navigation.state.routes.some(
     route =>
-      route.routeName === 'CameraAndUploadScreen' || route.routeName === 'Map'
+      route.routeName === 'CameraAndUploadScreen' ||
+      route.routeName === 'Map' ||
+      route.routeName === 'Comment'
   );
 
   return {
