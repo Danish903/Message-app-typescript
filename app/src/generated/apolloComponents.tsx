@@ -26,6 +26,21 @@ export type ChangePasswordInput = {
   token: Scalars["String"];
 };
 
+export type Comment = {
+  id: Scalars["ID"];
+  text: Scalars["String"];
+  userId: Scalars["ID"];
+  postId: Scalars["ID"];
+  sender?: Maybe<User>;
+  created_at: Scalars["DateTime"];
+  updated_at: Scalars["DateTime"];
+};
+
+export type CommentResponse = {
+  node?: Maybe<Comment>;
+  mutation: Scalars["String"];
+};
+
 export type EditProfileInput = {
   firstName?: Maybe<Scalars["String"]>;
   lastName?: Maybe<Scalars["String"]>;
@@ -41,6 +56,7 @@ export type LoginResponse = {
 export type Mutation = {
   login?: Maybe<LoginResponse>;
   createPost?: Maybe<Post>;
+  createComment: Scalars["Boolean"];
   likePost?: Maybe<Scalars["Boolean"]>;
   uploadPhoto: Scalars["String"];
   confirmUser?: Maybe<Scalars["Boolean"]>;
@@ -60,6 +76,11 @@ export type MutationLoginArgs = {
 
 export type MutationCreatePostArgs = {
   data: PostInput;
+};
+
+export type MutationCreateCommentArgs = {
+  text: Scalars["String"];
+  postId: Scalars["String"];
 };
 
 export type MutationLikePostArgs = {
@@ -128,10 +149,15 @@ export type PostLike = {
 
 export type Query = {
   activities: Array<Activity>;
+  getComments: Array<Comment>;
   posts: Array<Post>;
   getUser?: Maybe<User>;
   me?: Maybe<User>;
   helloWorld: Scalars["String"];
+};
+
+export type QueryGetCommentsArgs = {
+  postId: Scalars["String"];
 };
 
 export type QueryGetUserArgs = {
@@ -144,6 +170,14 @@ export type RegisterInput = {
   lastName: Scalars["String"];
   email: Scalars["String"];
   bio: Scalars["String"];
+};
+
+export type Subscription = {
+  newCommentNotification: CommentResponse;
+};
+
+export type SubscriptionNewCommentNotificationArgs = {
+  postId: Scalars["ID"];
 };
 
 export type User = {
@@ -171,6 +205,16 @@ export type AcitivityQueryQuery = { __typename?: "Query" } & {
       }
   >;
 };
+
+export type CreateCommentMutationVariables = {
+  postId: Scalars["String"];
+  text: Scalars["String"];
+};
+
+export type CreateCommentMutation = { __typename?: "Mutation" } & Pick<
+  Mutation,
+  "createComment"
+>;
 
 export type CreatePostMutationVariables = {
   data: PostInput;
@@ -318,6 +362,57 @@ export function withAcitivityQuery<TProps, TChildProps = {}>(
     AcitivityQueryQueryVariables,
     AcitivityQueryProps<TChildProps>
   >(AcitivityQueryDocument, operationOptions);
+}
+export const CreateCommentDocument = gql`
+  mutation CreateComment($postId: String!, $text: String!) {
+    createComment(postId: $postId, text: $text)
+  }
+`;
+
+export class CreateCommentComponent extends React.Component<
+  Partial<
+    ReactApollo.MutationProps<
+      CreateCommentMutation,
+      CreateCommentMutationVariables
+    >
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<
+        CreateCommentMutation,
+        CreateCommentMutationVariables
+      >
+        mutation={CreateCommentDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type CreateCommentProps<TChildProps = {}> = Partial<
+  ReactApollo.MutateProps<CreateCommentMutation, CreateCommentMutationVariables>
+> &
+  TChildProps;
+export type CreateCommentMutationFn = ReactApollo.MutationFn<
+  CreateCommentMutation,
+  CreateCommentMutationVariables
+>;
+export function withCreateComment<TProps, TChildProps = {}>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        CreateCommentMutation,
+        CreateCommentMutationVariables,
+        CreateCommentProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.withMutation<
+    TProps,
+    CreateCommentMutation,
+    CreateCommentMutationVariables,
+    CreateCommentProps<TChildProps>
+  >(CreateCommentDocument, operationOptions);
 }
 export const CreatePostDocument = gql`
   mutation CreatePost($data: PostInput!) {
