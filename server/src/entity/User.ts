@@ -13,6 +13,7 @@ import { Post } from './Post';
 import { PostLike } from './PostLike';
 import { MyContext } from '../types/MyContext';
 import { Activity } from './Activity';
+import { Comment } from './Comment';
 
 @ObjectType()
 @Entity()
@@ -63,6 +64,8 @@ export class User extends BaseEntity {
   @OneToMany(() => Activity, activity => activity.sender)
   activitySender: Activity[];
 
+  @OneToMany(() => Comment, comment => comment.sender)
+  comments: Comment[];
   @Field(() => [Post])
   async favoritePosts(@Ctx() ctx: MyContext): Promise<Post[]> {
     return ctx.postLoader.load(this.id);

@@ -2,12 +2,9 @@ import 'reflect-metadata';
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import { createConnection } from 'typeorm';
-import session from 'express-session';
-import connectRedis from 'connect-redis';
+
 import cors from 'cors';
 import http from 'http';
-
-import { redis, pubSub } from './redis';
 import { createSchema } from './utilities/createSchema';
 import { createUserLoader } from './utilities/usersLoader';
 import { createPostsLoader } from './utilities/postLoader';
@@ -25,37 +22,19 @@ const main = async () => {
       res,
       userLoader: createUserLoader(),
       postLoader: createPostsLoader(),
-      likedUsersLoader: createLikePostLoader(),
-      pubSub
+      likedUsersLoader: createLikePostLoader()
     })
   });
 
   const app = express();
 
   app.use('/images', express.static('images'));
-  const RedisStore = connectRedis(session);
+  //   const RedisStore = connectRedis(session);
 
   app.use(
     cors({
       credentials: true,
       origin: 'http://127.0.0.1:19001'
-    })
-  );
-
-  app.use(
-    session({
-      store: new RedisStore({
-        client: redis as any
-      }),
-      name: 'qid',
-      secret: `${process.env.REDIS_SECRET}`,
-      resave: false,
-      saveUninitialized: false,
-      cookie: {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 1000 * 60 * 60 * 24 * 7 * 365 // 7 years
-      }
     })
   );
 

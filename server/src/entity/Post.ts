@@ -13,6 +13,7 @@ import { User } from './User';
 import { MyContext } from 'src/types/MyContext';
 import { PostLike } from './PostLike';
 import { Activity } from './Activity';
+import { Comment } from './Comment';
 
 @ObjectType()
 @Entity()
@@ -49,6 +50,8 @@ export class Post extends BaseEntity {
 
   @OneToMany(() => PostLike, postLike => postLike.post)
   postLikes: PostLike[];
+  @OneToMany(() => Comment, comment => comment.post)
+  comments: Comment[];
 
   @Field(() => [User], { nullable: true })
   async likedUsers(@Ctx() ctx: MyContext): Promise<User[]> {

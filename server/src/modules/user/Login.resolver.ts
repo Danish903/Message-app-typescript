@@ -1,8 +1,7 @@
-import { Resolver, Mutation, Arg, Ctx, ObjectType, Field } from 'type-graphql';
+import { Resolver, Mutation, Arg, ObjectType, Field } from 'type-graphql';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { User } from '../../entity/User';
-import { MyContext } from '../../types/MyContext';
 
 export const JWT_SECRET = 'fasdfasdfasdfasdf';
 @Resolver()
@@ -17,8 +16,7 @@ class LoginResolver {
   @Mutation(() => LoginResponse, { nullable: true })
   async login(
     @Arg('email') email: string,
-    @Arg('password') password: string,
-    @Ctx() ctx: MyContext
+    @Arg('password') password: string
   ): Promise<LoginResponse | null> {
     const user = await User.findOne({ where: { email } });
 
@@ -28,8 +26,6 @@ class LoginResolver {
 
     if (!valid) throw new Error('Invalid password!');
     // if (!user.confirmed) return null;
-
-    ctx.req.session!.userId = user.id;
 
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
       expiresIn: '7 days'
